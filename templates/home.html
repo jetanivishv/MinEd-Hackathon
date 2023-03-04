@@ -8,102 +8,18 @@
     <link rel="stylesheet" href="../static/bulma/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.2.3/flatpickr.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.2.3/themes/dark.css">
+    <link rel="stylesheet" href="../static/styles/home.css">
     <title>Geek Mine</title>
-
-    <style>
-        h1 {
-            color: cornflowerblue;
-            border-bottom: 2px solid #c2cde1;
-        }
-
-        .box h3 {
-            margin-left: 10px;
-            margin-bottom: 10px;
-            color: cornflowerblue;
-            border-bottom: 2px solid #c2cde1;
-            padding-bottom: 10px;
-        }
-
-        .main {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            height: 100vh;
-        }
-
-        .main .box {
-            width: 25%;
-            height: fit-content;
-            min-width: 300px;
-        }
-
-        .submit {
-            display: flex;
-            justify-content: flex-end;
-            margin: 0%;
-            padding: 0%;
-        }
-
-        .submit>button {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .section {
-            padding: 0;
-            margin: 10px 0
-        }
-
-        form:nth-child(1) {
-            padding-bottom: 10px;
-        }
-
-        form:nth-child(2) {
-            border-top: 1px solid rgb(184, 183, 183);
-            padding-top: 17px;
-        }
-
-        .content {
-            width: 70%;
-            background-color: rgb(248, 248, 248);
-            height: fit-content;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-            border-radius: 10px;
-        }
-
-        .conversion {
-            margin: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .conversion div {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-        }
-
-        .conversion div:nth-child(2) {
-            margin-bottom: 10px;
-        }
-
-        .conversion label {
-            margin-left: 10px;
-            font-weight: 600;
-        }
-
-        .conversion div button {
-            margin: 0 10px;
-        }
-    </style>
 
 </head>
 
 <body>
     <section class="container is-widemax-desktop">
-        <h1 class="is-size-2 has-text-info p-5">Currency Exchange (USD/INR)</h1>
-        <button><a href="/graph">Graph</a></button>
+        <div class="graph m-2">
+            <h1 class="is-size-2 has-text-info p-5">Currency Exchange (USD/INR)
+                <a href="/graphs" class="button is-info is-rounded">Graphs</a>
+            </h1>
+        </div>
         <section class="main p-5">
             <div class="box has-background-link-light">
                 <form action="/predict" method="post" id="dateForm">
@@ -196,145 +112,7 @@
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.2.3/flatpickr.js"></script>
-<script>
-    if (document.getElementById("INRtoUSD")) {
-        const exchRate = parseFloat(document.getElementById("INRtoUSD").value)
-        document.getElementById("usdtoinr").addEventListener('click', (e) => {
-            let value = parseFloat(document.getElementById("USDtoINR").value)
-            if (isNaN(value)) {
-                document.getElementById("USDtoINR").value = 1
-                document.getElementById("INRtoUSD").value = exchRate
-                alert("Please Enter some valid value.")
-                return
-            }
-            if (value < 0) {
-                document.getElementById("USDtoINR").value = 1
-                document.getElementById("INRtoUSD").value = exchRate
-                alert("USD's value must be greater than or equal to 0.")
-                return
-            }
-            document.getElementById("INRtoUSD").value = value * exchRate;
-        })
-        document.getElementById("inrtousd").addEventListener('click', (e) => {
-            let value = parseFloat(document.getElementById("INRtoUSD").value)
-            if (isNaN(value)) {
-                document.getElementById("USDtoINR").value = 1
-                document.getElementById("INRtoUSD").value = exchRate
-                alert("Please Enter some valid value.")
-                return
-            }
-            if (value < 0) {
-                document.getElementById("USDtoINR").value = 1
-                document.getElementById("INRtoUSD").value = exchRate
-                alert("INR's value must be greater than or equal to 0.")
-                return
-            }
-            document.getElementById("USDtoINR").value = value / exchRate;
-        })
-    }
-
-    $("#date").flatpickr({
-        "allowInput": true,
-        "minDate": "today",
-        "disable": [
-            function (date) {
-                return (date.getDay() === 0 || date.getDay() === 6);  // disable weekends
-            }
-        ],
-        "locale": {
-            "firstDayOfWeek": 1
-        }
-    });
-
-    $("#startDate").flatpickr({
-        "allowInput": true,
-        "minDate": "today",
-        "disable": [
-            function (date) {
-                return (date.getDay() === 0 || date.getDay() === 6);  // disable weekends
-            },
-        ],
-        "locale": {
-            "firstDayOfWeek": 1
-        }
-    });
-
-    $("#endDate").flatpickr({
-        "allowInput": true,
-        "minDate": "today",
-        "disable": [
-            function (date) {
-                return (date.getDay() === 0 || date.getDay() === 6) // disable weekends
-            }
-        ],
-        "locale": {
-            "firstDayOfWeek": 1
-        }
-    });
-
-    function isValidDate(date) {
-
-        // Date format: YYYY-MM-DD
-        var datePattern = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/;
-
-        // Check if the date string format is a match
-        var matchArray = date.match(datePattern);
-        if (matchArray == null) {
-            return false;
-        }
-
-        // Remove any non digit characters
-        var dateString = date.replace(/\D/g, '');
-
-        // Parse integer values from the date string
-        var year = parseInt(dateString.substr(0, 4));
-        var month = parseInt(dateString.substr(4, 2));
-        var day = parseInt(dateString.substr(6, 2));
-
-        // Define the number of days per month
-        var daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-        // Leap years
-        if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
-            daysInMonth[1] = 29;
-        }
-
-        if (month < 1 || month > 12 || day < 1 || day > daysInMonth[month - 1]) {
-            return false;
-        }
-        return true;
-    }
-
-    document.getElementById("dateForm").addEventListener("submit", (e) => {
-        let date = $("#date")[0].value
-        if (!isValidDate(date)) {
-            e.preventDefault()
-            $("#date")[0].value = ""
-            alert("Plese Enter valid Date in YYYY-MM-DD format.")
-        }
-    })
-
-    document.getElementById("rangeForm").addEventListener("submit", (e) => {
-        let startDate = $("#startDate")[0].value
-        let endDate = $("#endDate")[0].value
-
-        if (isValidDate(startDate) && isValidDate(endDate)) {
-
-            let date1 = new Date(startDate)
-            let date2 = new Date(endDate)
-
-            if (date2 < date1) {
-                e.preventDefault()
-                $("#endDate")[0].value = ""
-                alert("End Date must be greater than Start Date.")
-            }
-        } else {
-            e.preventDefault()
-            $("#startDate")[0].value = ""
-            $("#endDate")[0].value = ""
-            alert("Plese Enter valid Date in YYYY-MM-DD format.")
-        }
-    })
+<script src="../static/Javascript/Home.js">
 
 </script>
 
