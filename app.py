@@ -31,6 +31,14 @@ def predict():
 def hello_world():
     return render_template("home.html", date="", predictedData="", len=-1)
 
+@ app.route("/graph")
+def graphs():
+    return render_template("graph.html")
+
+@ app.route("/candle")
+def candle():
+    return render_template("candle.html")
+
 
 if __name__ == '__main__':
     model.createModel()
