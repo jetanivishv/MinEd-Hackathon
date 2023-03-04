@@ -7,16 +7,199 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/bulma/css/bulma.min.css">
     <title>Geek Mine</title>
+
+    <style>
+        h1 {
+            color: cornflowerblue;
+            border-bottom: 2px solid #c2cde1;
+        }
+
+        .box h3 {
+            margin-left: 10px;
+            margin-bottom: 10px;
+            color: cornflowerblue;
+            border-bottom: 2px solid #c2cde1;
+            padding-bottom: 10px;
+        }
+
+        .main {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .main .box {
+            width: 25%;
+            height: fit-content;
+            min-width: 300px;
+        }
+
+        .submit {
+            display: flex;
+            justify-content: flex-end;
+            margin: 0%;
+            padding: 0%;
+        }
+
+        .submit>button {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .section {
+            padding: 0;
+            margin: 10px 0
+        }
+
+        form:nth-child(1) {
+            padding-bottom: 10px;
+        }
+
+        form:nth-child(2) {
+            border-top: 1px solid rgb(184, 183, 183);
+            padding-top: 17px;
+        }
+
+        .content {
+            width: 70%;
+            background-color: rgb(248, 248, 248);
+            height: fit-content;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .conversion {
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .conversion div {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+
+        .conversion div:nth-child(2) {
+            margin-bottom: 10px;
+        }
+
+        .conversion label {
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .conversion div button {
+            margin: 0 10px;
+        }
+    </style>
+
 </head>
 
 <body>
-    <section class="container is-max-desktop">
-        <h1 class="">Currency Exchange (USD/INR)</h1>
-        <form action="/predict" method="post">
-            <input type="date" name="date" />
-            <button type="submit">Submit</button>
-        </form>
+    <section class="container is-widemax-desktop">
+        <h1 class="is-size-2 has-text-info p-5">Currency Exchange (USD/INR)</h1>
+
+        <section class="main p-5">
+            <div class="box has-background-link-light">
+                <form action="/predict" method="post">
+                    <h3 class="is-size-4">Predict for Future date</h3>
+                    <section class="section">
+                        <label for="date" class="is-size-5 ml-2">Future Date</label>
+                        <input type="date" class="input is-rounded mt-1 " name="date" id="date" required>
+                    </section>
+
+                    <div class="submit">
+                        <button type="submit" class="button is-info is-rounded">Submit</button>
+                    </div>
+                </form>
+
+                <form action="/predictRange" method="post" class="mt-5">
+                    <h3 class="is-size-4">Predict for Future Dates</h3>
+
+                    <section class="section">
+                        <label for="startDate" class="is-size-5 ml-2">Future Start Date</label>
+                        <input type="date" class="input is-rounded mt-1" name="startDate" id="startDate" required>
+                    </section>
+
+                    <section class="section">
+                        <label for="endDate" class="is-size-5 ml-2">Future End Date</label>
+                        <input type="date" class="input is-rounded mt-1" name="endDate" id="endDate" required>
+                    </section>
+
+                    <div class="submit">
+                        <button type="submit" class="button is-info is-rounded">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div class="content">
+                {% if len == -1 %}
+                <p class="is-size-3 has-text-centered p-2 m-0">Your Prediction will Display Here</p>
+                {% elif len == 0 %}
+                <p class="is-size-3 has-text-link has-text-centered p-2 m-0">Predicted Exchnage Rate for
+                    <code><strong>Date: {{date}}</strong></code> is
+                    <code><strong>{{predictedData}} ₹</strong></code>
+                </p>
+                <div class="conversion">
+                    <section>
+                        <label for="USDtoINR">USD</label>
+                        <div>
+                            <input type="text" class="input is-rounded" id="USDtoINR" name="USDtoINR" value={{1}}>
+                            <button class="button is-info is-rounded" id="usdtoinr">convert</button>
+                        </div>
+                        <label for="INRtoUSD">INR</label>
+                        <div>
+                            <input type="text" class="input is-rounded" id="INRtoUSD" name="INRtoUSD"
+                                value={{predictedData}}>
+                            <button class="button is-info is-rounded" id="inrtousd">convert</button>
+                        </div>
+                    </section>
+                </div>
+                {% else %}
+                <p class="is-size-4 has-text-centered p-2 m-0">
+                    Predicted Data from <strong><code>{{predictedData[0][0]}}</code></strong> to
+                    <strong><code>{{predictedData[len-1][0]}}</code></strong>
+                </p>
+                <table class="table is-hoverable is-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Predicted Exchange Rate (USD to INR)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if len %}
+                        {%for i in range(0,len)%}
+                        <tr>
+                            <td>{{predictedData[i][0]}}</td>
+                            <td>{{predictedData[i][1]}} ₹</td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+        </section>
+
+
+
     </section>
 </body>
+
+
+<script>
+    const exchRate = parseFloat(document.getElementById("INRtoUSD").value)
+    document.getElementById("usdtoinr").addEventListener('click', (e) => {
+        let value = parseFloat(document.getElementById("USDtoINR").value)
+        document.getElementById("INRtoUSD").value = value * exchRate;
+    })
+    document.getElementById("inrtousd").addEventListener('click', (e) => {
+        let value = parseFloat(document.getElementById("INRtoUSD").value)
+        document.getElementById("USDtoINR").value = value / exchRate;
+    })
+</script>
 
 </html>
