@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/bulma/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.2.3/flatpickr.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.2.3/themes/dark.css">
     <title>Geek Mine</title>
 
     <style>
@@ -101,14 +103,15 @@
 <body>
     <section class="container is-widemax-desktop">
         <h1 class="is-size-2 has-text-info p-5">Currency Exchange (USD/INR)</h1>
-
+        <button><a href="/graph">Graph</a></button>
         <section class="main p-5">
             <div class="box has-background-link-light">
-                <form action="/predict" method="post">
+                <form action="/predict" method="post" id="dateForm">
                     <h3 class="is-size-4">Predict for Future date</h3>
                     <section class="section">
                         <label for="date" class="is-size-5 ml-2">Future Date</label>
-                        <input type="date" class="input is-rounded mt-1 " name="date" id="date" required>
+                        <input type="date" class="input is-rounded mt-1 " name="date" id="date" placeholder="YYYY-MM-DD"
+                            data-input required>
                     </section>
 
                     <div class="submit">
@@ -116,17 +119,19 @@
                     </div>
                 </form>
 
-                <form action="/predictRange" method="post" class="mt-5">
+                <form action="/predictRange" method="post" class="mt-5" id="rangeForm">
                     <h3 class="is-size-4">Predict for Future Dates</h3>
 
                     <section class="section">
                         <label for="startDate" class="is-size-5 ml-2">Future Start Date</label>
-                        <input type="date" class="input is-rounded mt-1" name="startDate" id="startDate" required>
+                        <input type="date" class="input is-rounded mt-1" name="startDate" id="startDate"
+                            placeholder="YYYY-MM-DD" data-input required>
                     </section>
 
                     <section class="section">
                         <label for="endDate" class="is-size-5 ml-2">Future End Date</label>
-                        <input type="date" class="input is-rounded mt-1" name="endDate" id="endDate" required>
+                        <input type="date" class="input is-rounded mt-1" name="endDate" id="endDate"
+                            placeholder="YYYY-MM-DD" data-input required>
                     </section>
 
                     <div class="submit">
@@ -146,12 +151,13 @@
                     <section>
                         <label for="USDtoINR">USD</label>
                         <div>
-                            <input type="text" class="input is-rounded" id="USDtoINR" name="USDtoINR" value={{1}}>
+                            <input type="number" min="0" class="input is-rounded" id="USDtoINR" name="USDtoINR"
+                                value={{1}}>
                             <button class="button is-info is-rounded" id="usdtoinr">convert</button>
                         </div>
                         <label for="INRtoUSD">INR</label>
                         <div>
-                            <input type="text" class="input is-rounded" id="INRtoUSD" name="INRtoUSD"
+                            <input type="number" min="0" class="input is-rounded" id="INRtoUSD" name="INRtoUSD"
                                 value={{predictedData}}>
                             <button class="button is-info is-rounded" id="inrtousd">convert</button>
                         </div>
@@ -188,18 +194,148 @@
 
     </section>
 </body>
-
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.2.3/flatpickr.js"></script>
 <script>
-    const exchRate = parseFloat(document.getElementById("INRtoUSD").value)
-    document.getElementById("usdtoinr").addEventListener('click', (e) => {
-        let value = parseFloat(document.getElementById("USDtoINR").value)
-        document.getElementById("INRtoUSD").value = value * exchRate;
+    if (document.getElementById("INRtoUSD")) {
+        const exchRate = parseFloat(document.getElementById("INRtoUSD").value)
+        document.getElementById("usdtoinr").addEventListener('click', (e) => {
+            let value = parseFloat(document.getElementById("USDtoINR").value)
+            if (isNaN(value)) {
+                document.getElementById("USDtoINR").value = 1
+                document.getElementById("INRtoUSD").value = exchRate
+                alert("Please Enter some valid value.")
+                return
+            }
+            if (value < 0) {
+                document.getElementById("USDtoINR").value = 1
+                document.getElementById("INRtoUSD").value = exchRate
+                alert("USD's value must be greater than or equal to 0.")
+                return
+            }
+            document.getElementById("INRtoUSD").value = value * exchRate;
+        })
+        document.getElementById("inrtousd").addEventListener('click', (e) => {
+            let value = parseFloat(document.getElementById("INRtoUSD").value)
+            if (isNaN(value)) {
+                document.getElementById("USDtoINR").value = 1
+                document.getElementById("INRtoUSD").value = exchRate
+                alert("Please Enter some valid value.")
+                return
+            }
+            if (value < 0) {
+                document.getElementById("USDtoINR").value = 1
+                document.getElementById("INRtoUSD").value = exchRate
+                alert("INR's value must be greater than or equal to 0.")
+                return
+            }
+            document.getElementById("USDtoINR").value = value / exchRate;
+        })
+    }
+
+    $("#date").flatpickr({
+        "allowInput": true,
+        "minDate": "today",
+        "disable": [
+            function (date) {
+                return (date.getDay() === 0 || date.getDay() === 6);  // disable weekends
+            }
+        ],
+        "locale": {
+            "firstDayOfWeek": 1
+        }
+    });
+
+    $("#startDate").flatpickr({
+        "allowInput": true,
+        "minDate": "today",
+        "disable": [
+            function (date) {
+                return (date.getDay() === 0 || date.getDay() === 6);  // disable weekends
+            },
+        ],
+        "locale": {
+            "firstDayOfWeek": 1
+        }
+    });
+
+    $("#endDate").flatpickr({
+        "allowInput": true,
+        "minDate": "today",
+        "disable": [
+            function (date) {
+                return (date.getDay() === 0 || date.getDay() === 6) // disable weekends
+            }
+        ],
+        "locale": {
+            "firstDayOfWeek": 1
+        }
+    });
+
+    function isValidDate(date) {
+
+        // Date format: YYYY-MM-DD
+        var datePattern = /^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/;
+
+        // Check if the date string format is a match
+        var matchArray = date.match(datePattern);
+        if (matchArray == null) {
+            return false;
+        }
+
+        // Remove any non digit characters
+        var dateString = date.replace(/\D/g, '');
+
+        // Parse integer values from the date string
+        var year = parseInt(dateString.substr(0, 4));
+        var month = parseInt(dateString.substr(4, 2));
+        var day = parseInt(dateString.substr(6, 2));
+
+        // Define the number of days per month
+        var daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+        // Leap years
+        if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
+            daysInMonth[1] = 29;
+        }
+
+        if (month < 1 || month > 12 || day < 1 || day > daysInMonth[month - 1]) {
+            return false;
+        }
+        return true;
+    }
+
+    document.getElementById("dateForm").addEventListener("submit", (e) => {
+        let date = $("#date")[0].value
+        if (!isValidDate(date)) {
+            e.preventDefault()
+            $("#date")[0].value = ""
+            alert("Plese Enter valid Date in YYYY-MM-DD format.")
+        }
     })
-    document.getElementById("inrtousd").addEventListener('click', (e) => {
-        let value = parseFloat(document.getElementById("INRtoUSD").value)
-        document.getElementById("USDtoINR").value = value / exchRate;
+
+    document.getElementById("rangeForm").addEventListener("submit", (e) => {
+        let startDate = $("#startDate")[0].value
+        let endDate = $("#endDate")[0].value
+
+        if (isValidDate(startDate) && isValidDate(endDate)) {
+
+            let date1 = new Date(startDate)
+            let date2 = new Date(endDate)
+
+            if (date2 < date1) {
+                e.preventDefault()
+                $("#endDate")[0].value = ""
+                alert("End Date must be greater than Start Date.")
+            }
+        } else {
+            e.preventDefault()
+            $("#startDate")[0].value = ""
+            $("#endDate")[0].value = ""
+            alert("Plese Enter valid Date in YYYY-MM-DD format.")
+        }
     })
+
 </script>
 
 </html>
